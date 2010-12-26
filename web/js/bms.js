@@ -1,5 +1,5 @@
 /**
- * @fileoverview O2.
+ * @fileoverview O2 BMS.
  * @author yyfrankyy<yyfrankyy@gmail.com>
  *
  * @license
@@ -17,17 +17,9 @@
  *
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
-KISSY.app('O2');
-O2.add({
-    'notes': {
-        fullpath: 'js/notes.js'
-    },
-    'keyboard': {
-        fullpath: 'js/keyboard.js'
-    },
-    'core': {
-        fullpath: 'js/bms.js',
-        requires: ['notes', 'keyboard']
-    }
+O2.add('bms', function() {
+    O2.BMS = {
+        keys: [11, 12, 13, 14, 15, 17, 18],
+        level: ['非常困难', '困难', '中等', '简单']
+    };
 });
-O2.use('core');

@@ -22,7 +22,7 @@ O2.add('notes', function(O2, undefined) {
 
     var defaultConfig = {
         lengthPerQuaers: 100,
-        height: 20,
+        height: 10,
     };
 
     var color = {
@@ -65,9 +65,9 @@ O2.add('notes', function(O2, undefined) {
 
         var channels = [];
         while (s < l) {
+            channels.push(s);
             drawLine(nctx, '#ffffff', {x: s, y: 0}, {x: s, y: h}, 1);
             drawRect(nctx, color.blue, s, Math.random() * 500, p, self.config.height);
-            channels.push(s);
             s += p;
         }
 
@@ -104,13 +104,17 @@ O2.add('notes', function(O2, undefined) {
             }
         });
 
+        var mc = S.get('#meta');
+        S.one(S.DOM.create('<dt>标题</dt><dd>' + self.header['TITLE'] + '</dd>')).appendTo(mc);
+        S.one(S.DOM.create('<dt>作者</dt><dd>' + self.header['ARTIST'] + '</dd>')).appendTo(mc);
+        S.one(S.DOM.create('<dt>曲风</dt><dd>' + self.header['GENRE'] + '</dd>')).appendTo(mc);
+        S.one(S.DOM.create('<dt>难度</dt><dd>' + O2.BMS.level[self.header['RANK']] + '</dd>')).appendTo(mc);
     };
 
     S.ready(function() {
         S.IO.get('../data/moon_01.json', function(o) {
             var notes = new Notes(S.JSON.parse(o), {notesContainer: S.get('#notes-canvas-notes'), effectContainer: S.get('#notes-canvas')});
             O2.Music = notes;
-            console.log(notes);
         });
     });
 });
