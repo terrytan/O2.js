@@ -32,7 +32,7 @@ class BMS():
             'BMP': {},
             # CHANGE MUSIC SPEED'
             'BPM': {}
-        }, body = []):
+        }, body = {}):
 
         self.header = header
         self.define = define
@@ -61,17 +61,26 @@ class BMS():
         for i in self.define:
             g = self.re_cache[i].match(line)
             if g:
-                self.define[i][g.group(1).strip()] = g.group(2).strip()
+                self.define[i][g.group(1)] = g.group(2)
 
     def parser_body(self, line):
         """parse bms body"""
         g = self.re_cache['BODY'].match(line)
         if g:
-            self.body.append({
-                'TRACK': g.group(1),
-                'CHANNEL': g.group(2),
-                'MESSAGE': g.group(3)
-            })
+            if g.group(1) not in self.body:
+                self.body[g.group(1)] = {}
+            self.body[g.group(1)][g.group(2)] = self.parser_message(g.group(3))
+
+    def parser_message(self, message, start = 0, per = 2):
+        """parse main music data to offset data"""
+        message_list, map_list = [], {}
+        while start < len(message):
+            message_list.append(message[start : start + per])
+            start += per
+        for i in message_list:
+            # notice that parser did not filte any thing, even we already known that '00' meant nothing.
+            map_list[i] = float(message_list.index(i)) / float(len(message_list))
+        return map_list
 
 
 def bms_parser(bms_file):
@@ -95,8 +104,17 @@ def bms_parser(bms_file):
         elif body:
             bms.parser_body(line)
 
-    print json.dumps({
-        'header': bms.header,
-        'define': bms.define
-    })
+    print bms.body
+    for i in bms.body:
+        print '|--session start----'
+        for j in bms.body[i]:
+            print '|--|--track start----'
+            for k in bms.body[i][j]:
+                if k in bms.define['WAV']:
+                    print '|--|--|--' + bms.define['WAV'][k] + '----'
+                    pass
+                else:
+                    print '|--|--|--NOTHING HERE----'
+                    pass
+
 bms_parser('moon_01.bms')
