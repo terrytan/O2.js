@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="gbk" />
+        <title>O2 DEMO</title>
+        <link href='http://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
+        <style>
+            ::-webkit-scrollbar {
+                width: 10px;
+                height: 10px;
+            }
+            ::-webkit-scrollbar-track-piece {
+                background-color:#fff;
+            }
+            ::-webkit-scrollbar-thumb:vertical {
+                background:#333;
+            }
+            #notes {
+                width: 400px;
+                height: 800px;
+                border: 2px solid #ccc;
+                margin: 0 auto;
+                -webkit-border-radius: 4px;
+                -webkit-box-shadow: 0 0 5px #ccc;
+                overflow: hidden;
+            }
+            #notes .hd,
+            #notes .ft {
+                font-family: 'Lobster', arial, serif;
+                width: 400px;
+                background: #eee;
+                height: 50px;
+                font-size: 48px;
+                text-align: center;
+            }
+            #notes .bd {
+                height: 700px;
+                width: 400px;
+                overflow-y: scroll
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="notes">
+            <div class="hd">O2.js</div>
+            <div class="bd">
+                <canvas id="notes-canvas"></canvas>
+            </div>
+            <div class="ft">0</div>
+        </div>
+        <script src="http://a.tbcdn.cn/s/kissy/1.1.6/kissy.js"></script> 
+        <script src="js/core.js"></script> 
+        <script>
+            O2.use('notes');
+        </script>
+    </body>
+</html>
+
