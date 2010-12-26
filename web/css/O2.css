@@ -1,0 +1,48 @@
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track-piece {
+    background-color: #fff;
+}
+::-webkit-scrollbar-thumb:vertical {
+    background: #eee;
+}
+#notes {
+    width: 400px;
+    height: 600px;
+    border: 2px solid #ccc;
+    margin: 0 auto;
+    -webkit-border-radius: 4px;
+    -webkit-box-shadow: 0 0 5px #ccc;
+    overflow: hidden;
+}
+#notes .hd,
+#notes .ft {
+    font-family: 'Lobster', arial, serif;
+    width: 400px;
+    background: #ccc;
+    height: 50px;
+    font-size: 48px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+#notes .bd {
+    height: 500px;
+    width: 400px;
+    overflow: hidden;
+    position: relative;
+}
+
+#notes-canvas {
+    background: #eee;
+    border: 1px solid #fff;
+}
+
+#notes-canvas,
+#notes-canvas-notes {
+    position: absolute;
+    top: 0;
+    left: 0;
+}

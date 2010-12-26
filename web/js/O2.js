@@ -21,5 +21,12 @@ KISSY.app('O2');
 O2.add({
     'notes': {
         fullpath: 'js/notes.js'
+    },
+    'keyboard': {
+        fullpath: 'js/keyboard.js'
+    },
+    'core': {
+        requires: ['notes', 'keyboard']
     }
 });
+O2.use('core');
