@@ -105,16 +105,16 @@ def bms_parser(bms_file):
             bms.parser_body(line)
 
     print bms.body
-    for i in bms.body:
-        print '|--session start----'
-        for j in bms.body[i]:
-            print '|--|--track start----'
-            for k in bms.body[i][j]:
-                if k in bms.define['WAV']:
-                    print '|--|--|--' + bms.define['WAV'][k] + '----'
-                    pass
-                else:
-                    print '|--|--|--NOTHING HERE----'
-                    pass
+    #for i in bms.body:
+        #print '|--session start----'
+        #for j in bms.body[i]:
+            #print '|--|--track start----'
+            #for k in bms.body[i][j]:
+                #if k in bms.define['WAV']:
+                    #print '|--|--|--' + bms.define['WAV'][k] + '----'
+                    #pass
+                #else:
+                    #print '|--|--|--NOTHING HERE----'
+                    #pass
 
 bms_parser('moon_01.bms')
