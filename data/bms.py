@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # vim: fileencoding=utf-8:
-import os,re,json
+import os,re
 
 class BMS():
     """BMS Object"""
@@ -81,40 +81,25 @@ class BMS():
             # notice that parser did not filte any thing, even we already known that '00' meant nothing.
             map_list[i] = float(message_list.index(i)) / float(len(message_list))
         return map_list
+    
+    def parse(self, bms_file):
+        """parse a bms file"""
+        header = body = False
+        bms_header_markup = re.compile('^\*---------------------- HEADER FIELD')
+        bms_body_markup = re.compile('\*---------------------- MAIN DATA FIELD')
 
+        re_cache = {}
 
-def bms_parser(bms_file):
-    """parse a bms file to a BMS instance"""
-    header = body = False
-    bms_header_markup = re.compile('^\*---------------------- HEADER FIELD')
-    bms_body_markup = re.compile('\*---------------------- MAIN DATA FIELD')
+        for line in open(bms_file).readlines():
+            if bms_header_markup.match(line):
+                header = True
+                body = False
+            if bms_body_markup.match(line):
+                header = False
+                body = True
+            if header:
+                self.parser_header(line)
+            elif body:
+                self.parser_body(line)
 
-    bms = BMS()
-    re_cache = {}
-
-    for line in open(bms_file).readlines():
-        if bms_header_markup.match(line):
-            header = True
-            body = False
-        if bms_body_markup.match(line):
-            header = False
-            body = True
-        if header:
-            bms.parser_header(line)
-        elif body:
-            bms.parser_body(line)
-
-    print bms.body
-    #for i in bms.body:
-        #print '|--session start----'
-        #for j in bms.body[i]:
-            #print '|--|--track start----'
-            #for k in bms.body[i][j]:
-                #if k in bms.define['WAV']:
-                    #print '|--|--|--' + bms.define['WAV'][k] + '----'
-                    #pass
-                #else:
-                    #print '|--|--|--NOTHING HERE----'
-                    #pass
-
-bms_parser('moon_01.bms')
+        return self
