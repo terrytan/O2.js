@@ -22,14 +22,14 @@ O2.add('notes', function(O2, undefined) {
 
     var defaultConfig = {
         lengthPerQuaers: 100,
-        height: 10,
+        height: 10
     };
 
     var color = {
-        blue: "#009999",
-        red: "#ff0000",
-        green: "#00cc00",
-        orange: "#ff7400"
+        blue: '#009999',
+        red: '#ff0000',
+        green: '#00cc00',
+        orange: '#ff7400'
     };
 
     var drawLine = function(context, color, start, end, width) {
@@ -61,7 +61,7 @@ O2.add('notes', function(O2, undefined) {
 
         var nc = self.config.notesContainer, ec = self.config.effectContainer;
         var nctx = nc.getContext('2d'), ectx = ec.getContext('2d');
-        var l = nc.width, h = nc.height, p = l/7, s = 0;
+        var l = nc.width, h = nc.height, p = l / 7, s = 0;
 
         var channels = [];
         while (s < l) {
@@ -76,7 +76,7 @@ O2.add('notes', function(O2, undefined) {
             keyMap = [
                 {which: 83, color: color.blue, keyDown: false},
                 {which: 68, color: color.green, keyDown: false},
-                {which: 70, color: color.blue, keyDown: false}, 
+                {which: 70, color: color.blue, keyDown: false},
                 {which: 32, color: color.red, keyDown: false},
                 {which: 74, color: color.blue, keyDown: false},
                 {which: 75, color: color.green, keyDown: false},
@@ -90,7 +90,7 @@ O2.add('notes', function(O2, undefined) {
                 ectx.fillStyle = drawGradient(ectx,
                     {0: 'rgba(255, 255, 255, 0)', 1: keyMap[i].color},
                     s, 0, s, h);
-                drawRect(ectx, ectx.fillStyle, s, 0, p, h)
+                drawRect(ectx, ectx.fillStyle, s, 0, p, h);
                 keyMap[i].keyDown = true;
             }
         });
@@ -115,6 +115,7 @@ O2.add('notes', function(O2, undefined) {
         S.IO.get('../data/moon_01.json', function(o) {
             var notes = new Notes(S.JSON.parse(o), {notesContainer: S.get('#notes-canvas-notes'), effectContainer: S.get('#notes-canvas')});
             O2.Music = notes;
+            console.log(notes);
         });
     });
 });

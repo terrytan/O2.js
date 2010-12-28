@@ -1,5 +1,5 @@
 body {
-    background: #eee url(http://wallcoo.com/game/Videogame_Remakes_by_Orioto/wallpapers/1920x1200/Dogs_and_Bullets.jpg);
+    /*background: #eee url(http://wallcoo.com/game/Videogame_Remakes_by_Orioto/wallpapers/1920x1200/Dogs_and_Bullets.jpg);*/
 }
 
 ::-webkit-scrollbar {
@@ -31,7 +31,7 @@ body {
 }
 #notes .hd,
 #notes .ft {
-    font-family: 'Lobster', arial, serif;
+    /*font-family: 'Lobster', arial, serif;*/
     width: 280px;
     background: #ccc;
     height: 50px;
