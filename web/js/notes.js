@@ -18,10 +18,10 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 O2.add('notes', function(O2, undefined) {
-    var S = KISSY;
+    var S = KISSY, E = S.Event;
 
     var defaultConfig = {
-        lengthPerQuaers: 100,
+        lengthPerQuaers: 500,
         height: 10
     };
 
@@ -59,17 +59,69 @@ O2.add('notes', function(O2, undefined) {
         S.mix(self, o);
         self.config = S.mix(defaultConfig, config);
 
+        // notes, effects
         var nc = self.config.notesContainer, ec = self.config.effectContainer;
         var nctx = nc.getContext('2d'), ectx = ec.getContext('2d');
-        var l = nc.width, h = nc.height, p = l / 7, s = 0;
+        var nl = nc.width, h = nc.height, p = nl / 7;
 
-        var channels = [];
-        while (s < l) {
-            channels.push(s);
-            drawLine(nctx, '#ffffff', {x: s, y: 0}, {x: s, y: h}, 1);
-            drawRect(nctx, color.blue, s, Math.random() * 500, p, self.config.height);
-            s += p;
-        }
+        var channels = [], notes = {}, i = 0, j = 0, k = 0, s = 0;
+
+        // redraw notes
+        var redraw = function() {
+            nctx.clearRect(0, 0, nl, h);
+
+            // init all notes data
+            localStorage.setItem('quaer', window.location.hash.replace(/^#/, '') || '001');
+            var sample = localStorage.getItem('quaer');
+            for (i = 0, l = O2.BMS.keys.length; i < l; i++) {
+                for (k in self.body[sample]) {
+                    var _i = parseInt(k),
+                        _index = O2.BMS.keys.indexOf(_i);
+                    if (_index === i) {
+                        notes[i + ''] = self.body[sample][k];
+                    }
+                }
+            }
+
+            // draw split line, maybe this can be draw at a single canvas
+            j = 0; s = 0;
+            while (s < nl) {
+                channels.push(s);
+                drawLine(nctx, '#ffffff', {x: s, y: 0}, {x: s, y: h}, 1);
+                s += p; j++;
+            }
+
+            // draw notes
+            for (i in notes) {
+                for (j in notes[i]) {
+                    // 00 means nothing¡­¡­
+                    if (j === '00') continue;
+                    drawRect(nctx, color.blue, channels[+i], notes[i][j] * 500, p, self.config.height);
+                }
+            }
+
+            // auto update hash
+            var currentIndex = +(window.location.hash.replace(/^#/, '') || '001');
+            var autoplay = S.later(function() {
+                window.location.hash = '#' + padding(++currentIndex, 3);
+            }, 1000);
+        };
+
+        var padding = function(num, len, markup) {
+            // 9999 10 0000009999
+            len = Math.pow(10, len - 1); markup = markup || 0;
+            if (num < len) {
+                var l = len.toString().length - num.toString().length, za = [];
+                while (za.length < l) {
+                    za[za.length] = markup;
+                }
+                return za.join('') + num;
+            }
+            return num;
+        };
+
+        redraw();
+        E.on(window, 'hashchange', redraw);
 
         // s,d,f,space,j,k,l
         var keys = [83, 68, 70, 32, 74, 75, 76],
@@ -82,7 +134,7 @@ O2.add('notes', function(O2, undefined) {
                 {which: 75, color: color.green, keyDown: false},
                 {which: 76, color: color.blue, keyDown: false}
             ];
-        KISSY.Event.on(document, 'keydown', function(e) {
+        E.on(document, 'keydown', function(e) {
             var i = keys.indexOf(e.keyCode);
             if (i !== -1) {
                 if (keyMap[i].keyDown) return;
@@ -95,7 +147,7 @@ O2.add('notes', function(O2, undefined) {
             }
         });
 
-        KISSY.Event.on(document, 'keyup', function(e) {
+        E.on(document, 'keyup', function(e) {
             var i = keys.indexOf(e.keyCode);
             if (i !== -1) {
                 var s = channels[i];
@@ -115,7 +167,6 @@ O2.add('notes', function(O2, undefined) {
         S.IO.get('../data/moon_01.json', function(o) {
             var notes = new Notes(S.JSON.parse(o), {notesContainer: S.get('#notes-canvas-notes'), effectContainer: S.get('#notes-canvas')});
             O2.Music = notes;
-            console.log(notes);
         });
     });
 });
