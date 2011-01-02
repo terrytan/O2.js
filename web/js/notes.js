@@ -70,7 +70,7 @@ O2.add('notes', function(O2, undefined) {
 
         var nl = nc.width, h = nc.height, p = nl / 7;
 
-        var channels = [], notes = {}, i = 0, j = 0, k = 0, s = 0;
+        var channels = [], notes = {}, longNotes = {}, i = 0, j = 0, k = 0, s = 0;
 
         // draw split line, maybe this can be draw at a single canvas
         j = 0; s = 0;
@@ -101,15 +101,20 @@ O2.add('notes', function(O2, undefined) {
                         if (O2.BMS.keys.indexOf(+k) === i) {
                             notes[i.toString()] = self.body[quaer][k];
                         }
+                        if (O2.BMS.longKeys.indexOf(+k) === i) {
+                            longNotes[i.toString()] = self.body[quaer][k];
+                        }
                     }
                 }
 
                 // quaer self increasement
                 quaer = padding(+quaer + 1, 3);
 
-                // draw notes
+                // draw notes {{{
                 var notesColor = [color.white, color.blue, color.white, color.orange, color.white, color.blue, color.white];
                 drawLine(nctx, color.white, {x: 0, y: h - self.config.lengthPerQuaers - start}, {x: nc.width, y: h - self.config.lengthPerQuaers - start}, 1);
+
+                // short notes
                 for (i in notes) {
                     for (j in notes[i]) {
                         // 00 means nothing¡­¡­
@@ -124,6 +129,31 @@ O2.add('notes', function(O2, undefined) {
                         );
                     }
                 }
+
+                // long notes
+                //for (i in longNotes) {
+                    //var start, end;
+                    //for (j in longNotes[i]) {
+                        //if (notes[i][j] === '00') continue;
+                        //if (!start) {
+                            //start = j;
+                        //} else if (start && !end) {
+                            //end = j;
+                        //}
+                        //if (start && end) {
+                            //drawRect(
+                                //nctx,
+                                //notesColor[+i],
+                                //channels[+i],
+                                //h - j * self.config.lengthPerQuaers - self.config.height - start + offset,
+                                //p,
+                                //(end - start) * self.config.lengthPerQuaers
+                            //);
+                            //start = end = 0;
+                        //}
+                    //}
+                //}
+                // }}}
 
                 start += self.config.lengthPerQuaers;
             }
