@@ -52,7 +52,7 @@ class BMS():
         """set header"""
         self.header[key] = item
 
-    def parser_header(self, line):
+    def parse_header(self, line):
         """parse bms header"""
         for i in self.header:
             g = self.re_cache[i].match(line)
@@ -63,23 +63,26 @@ class BMS():
             if g:
                 self.define[i][g.group(1)] = g.group(2)
 
-    def parser_body(self, line):
+    def parse_body(self, line):
         """parse bms body"""
         g = self.re_cache['BODY'].match(line)
         if g:
             if g.group(1) not in self.body:
                 self.body[g.group(1)] = {}
-            self.body[g.group(1)][g.group(2)] = self.parser_message(g.group(3))
+            self.body[g.group(1)][g.group(2)] = self.parse_message(g.group(3))
+            if g.group(1) == '003':
+                print self.parse_message(g.group(3))
 
-    def parser_message(self, message, start = 0, per = 2):
+    def parse_message(self, message, start = 0, per = 2):
         """parse main music data to offset data"""
         message_list, map_list = [], {}
         while start < len(message):
             message_list.append(message[start : start + per])
             start += per
-        for i in message_list:
+        message_len = len(message_list)
+        for i in range(message_len):
             # notice that parser did not filte any thing, even we already known that '00' meant nothing.
-            map_list[i] = float(message_list.index(i)) / float(len(message_list))
+            map_list[float(i) / float(message_len)] = message_list[i]
         return map_list
     
     def parse(self, bms_file):
@@ -90,6 +93,14 @@ class BMS():
 
         re_cache = {}
 
+        try:
+            # gbk2utf8
+            bms_content = open(bms_file).read()
+            new_content = bms_content.decode('GBK').encode('UTF8')
+            open(bms_file, 'w').write(new_content)
+        except:
+            pass
+
         for line in open(bms_file).readlines():
             if bms_header_markup.match(line):
                 header = True
@@ -98,8 +109,8 @@ class BMS():
                 header = False
                 body = True
             if header:
-                self.parser_header(line)
+                self.parse_header(line)
             elif body:
-                self.parser_body(line)
+                self.parse_body(line)
 
         return self

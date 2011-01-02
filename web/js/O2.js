@@ -18,16 +18,20 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 KISSY.app('O2');
-O2.add({
-    'notes': {
-        fullpath: 'js/notes.js'
-    },
-    'keyboard': {
-        fullpath: 'js/keyboard.js'
-    },
-    'core': {
-        fullpath: 'js/bms.js',
-        requires: ['notes', 'keyboard']
-    }
+O2.MODS = [
+    'notes',
+    'keyboard',
+    'audio'
+];
+
+KISSY.each(O2.MODS, function(o) {
+    O2.add(o, {
+        fullpath: 'js/' + o + '.js'
+    });
+});
+
+O2.add('core', {
+    fullpath: 'js/bms.js',
+    requires: O2.MODS
 });
 O2.use('core');

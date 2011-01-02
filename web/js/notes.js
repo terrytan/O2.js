@@ -28,10 +28,12 @@ O2.add('notes', function(O2, undefined) {
     var color = {
         blue: '#009999',
         red: '#ff0000',
+        white: '#ffffff',
         green: '#00cc00',
         orange: '#ff7400'
     };
 
+    // draw a line, rect, gradient {{{
     var drawLine = function(context, color, start, end, width) {
         context.strokeStyle = color;
         context.lineWidth = 1;
@@ -53,6 +55,7 @@ O2.add('notes', function(O2, undefined) {
         }
         return gradient;
     };
+    // }}}
 
     var Notes = function(o, config) {
         var self = this;
@@ -91,24 +94,32 @@ O2.add('notes', function(O2, undefined) {
                 s += p; j++;
             }
 
+            var _color = [color.white, color.blue, color.white, color.orange, color.white, color.blue, color.white];
             // draw notes
             for (i in notes) {
                 for (j in notes[i]) {
                     // 00 means nothing……
-                    if (j === '00') continue;
-                    drawRect(nctx, color.blue, channels[+i], notes[i][j] * 500, p, self.config.height);
+                    if (notes[i][j] === '00') continue;
+                    drawRect(
+                        nctx,
+                        _color[+i],
+                        channels[+i],
+                        (1 - j) * self.config.lengthPerQuaers - self.config.height,
+                        p,
+                        self.config.height
+                    );
                 }
             }
 
             // auto update hash
-            var currentIndex = +(window.location.hash.replace(/^#/, '') || '001');
+            var currentIndex = +(window.location.hash.replace(/^#/, '') || 0);
             var autoplay = S.later(function() {
-                window.location.hash = '#' + padding(++currentIndex, 3);
+                //window.location.hash = '#' + padding(++currentIndex, 3);
             }, 1000);
         };
 
+        // padding numbers 9999 10 0000009999
         var padding = function(num, len, markup) {
-            // 9999 10 0000009999
             len = Math.pow(10, len - 1); markup = markup || 0;
             if (num < len) {
                 var l = len.toString().length - num.toString().length, za = [];
@@ -161,10 +172,11 @@ O2.add('notes', function(O2, undefined) {
         S.one(S.DOM.create('<dt>作者</dt><dd>' + self.header['ARTIST'] + '</dd>')).appendTo(mc);
         S.one(S.DOM.create('<dt>曲风</dt><dd>' + self.header['GENRE'] + '</dd>')).appendTo(mc);
         S.one(S.DOM.create('<dt>难度</dt><dd>' + O2.BMS.level[self.header['RANK']] + '</dd>')).appendTo(mc);
+        S.one(S.DOM.create('<dt>等级</dt><dd>' + O2.BMS.level[self.header['PLAYLEVEL']] + '</dd>')).appendTo(mc);
     };
 
     S.ready(function() {
-        S.IO.get('../data/moon_01.json', function(o) {
+        S.IO.get('../data/canon/canon.json', function(o) {
             var notes = new Notes(S.JSON.parse(o), {notesContainer: S.get('#notes-canvas-notes'), effectContainer: S.get('#notes-canvas')});
             O2.Music = notes;
         });

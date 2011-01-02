@@ -1,5 +1,5 @@
 /**
- * @fileoverview O2 BMS.
+ * @fileoverview O2 Storage.
  * @author yyfrankyy<yyfrankyy@gmail.com>
  *
  * @license
@@ -17,11 +17,5 @@
  *
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
-O2.add('bms', function() {
-    O2.BMS = {
-        //keys: [11, 12, 13, 14, 15, 18, 19],
-        //文档上说的是上面这个，但是BMSE和O2解析出来的是下面这种
-        keys: [16, 11, 12, 13, 14, 15, 18],
-        level: ['非常困难', '困难', '中等', '简单']
-    };
+O2.add('storage', function(O2, undefined) {
 });
