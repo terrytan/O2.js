@@ -242,8 +242,8 @@ O2.add('notes', function(O2, undefined) {
             S.one(S.DOM.create('<dt>作者</dt><dd>' + notes.header['ARTIST'] + '</dd>')).appendTo(mc);
             S.one(S.DOM.create('<dt>曲风</dt><dd>' + notes.header['GENRE'] + '</dd>')).appendTo(mc);
             S.one(S.DOM.create('<dt>难度</dt><dd>' + O2.BMS.level[notes.header['RANK']] + '</dd>')).appendTo(mc);
-            S.one(S.DOM.create('<dt>等级</dt><dd>' + O2.BMS.level[notes.header['PLAYLEVEL']] + '</dd>')).appendTo(mc);
+            S.one(S.DOM.create('<dt>等级</dt><dd>' + notes.header['PLAYLEVEL'] + '</dd>')).appendTo(mc);
         });
-        O2.FPS.log('#fps');
+        O2.FPS.log('#notes .ft');
     });
 });
