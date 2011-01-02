@@ -21,6 +21,7 @@ KISSY.app('O2');
 O2.MODS = [
     'notes',
     'keyboard',
+    'fps',
     'audio'
 ];
 

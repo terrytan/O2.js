@@ -21,8 +21,9 @@ O2.add('notes', function(O2, undefined) {
     var S = KISSY, E = S.Event;
 
     var defaultConfig = {
-        lengthPerQuaers: 500,
-        height: 10
+        lengthPerQuaers: 1000,
+        speed: 2,
+        height: 8
     };
 
     var color = {
@@ -39,7 +40,7 @@ O2.add('notes', function(O2, undefined) {
         context.lineWidth = 1;
         context.beginPath();
         context.moveTo(start.x, start.y);
-        context.lineTo(start.x, end.y);
+        context.lineTo(end.x, end.y);
         context.stroke();
     };
 
@@ -63,59 +64,66 @@ O2.add('notes', function(O2, undefined) {
         self.config = S.mix(defaultConfig, config);
 
         // notes, effects
-        var nc = self.config.notesContainer, ec = self.config.effectContainer;
-        var nctx = nc.getContext('2d'), ectx = ec.getContext('2d');
+        var nc = self.config.notesContainer, nctx = nc.getContext('2d'),
+            ec = self.config.effectContainer, ectx = ec.getContext('2d'),
+            bc = self.config.backgroundContainer, bctx = bc.getContext('2d');
+
         var nl = nc.width, h = nc.height, p = nl / 7;
 
         var channels = [], notes = {}, i = 0, j = 0, k = 0, s = 0;
 
+        // draw split line, maybe this can be draw at a single canvas
+        j = 0; s = 0;
+        while (s < nl) {
+            channels.push(s);
+            drawLine(bctx, color.white, {x: s, y: 0}, {x: s, y: h}, 1);
+            s += p; j++;
+        }
+        var offset = +(localStorage.getItem('offset'));
+
+        localStorage.setItem('quaer', window.location.hash.replace(/^#/, '') || '001');
+
         // redraw notes
         var redraw = function() {
-            nctx.clearRect(0, 0, nl, h);
+            O2.FPS.init();
 
-            // init all notes data
-            localStorage.setItem('quaer', window.location.hash.replace(/^#/, '') || '001');
-            var sample = localStorage.getItem('quaer');
-            for (i = 0, l = O2.BMS.keys.length; i < l; i++) {
-                for (k in self.body[sample]) {
-                    var _i = parseInt(k),
-                        _index = O2.BMS.keys.indexOf(_i);
-                    if (_index === i) {
-                        notes[i + ''] = self.body[sample][k];
+            nctx.clearRect(0, 0, nl, h);
+            var start = 0, quaer = localStorage.getItem('quaer');
+            // reset
+            while (start < h + self.config.lengthPerQuaers) {
+                var notes = {}, i = 0, j = 0, k = 0, s = 0;
+                for (i = 0, l = O2.BMS.keys.length; i < l; i++) {
+                    for (k in self.body[quaer]) {
+                        if (O2.BMS.keys.indexOf(+k) === i) {
+                            notes[i.toString()] = self.body[quaer][k];
+                        }
                     }
                 }
-            }
 
-            // draw split line, maybe this can be draw at a single canvas
-            j = 0; s = 0;
-            while (s < nl) {
-                channels.push(s);
-                drawLine(nctx, '#ffffff', {x: s, y: 0}, {x: s, y: h}, 1);
-                s += p; j++;
-            }
+                // quaer self increasement
+                quaer = padding(+quaer + 1, 3);
 
-            var _color = [color.white, color.blue, color.white, color.orange, color.white, color.blue, color.white];
-            // draw notes
-            for (i in notes) {
-                for (j in notes[i]) {
-                    // 00 means nothing……
-                    if (notes[i][j] === '00') continue;
-                    drawRect(
-                        nctx,
-                        _color[+i],
-                        channels[+i],
-                        (1 - j) * self.config.lengthPerQuaers - self.config.height,
-                        p,
-                        self.config.height
-                    );
+                // draw notes
+                var notesColor = [color.white, color.blue, color.white, color.orange, color.white, color.blue, color.white];
+                drawLine(nctx, color.white, {x: 0, y: h - self.config.lengthPerQuaers - start}, {x: nc.width, y: h - self.config.lengthPerQuaers - start}, 1);
+                for (i in notes) {
+                    for (j in notes[i]) {
+                        // 00 means nothing……
+                        if (notes[i][j] === '00') continue;
+                        drawRect(
+                            nctx,
+                            notesColor[+i],
+                            channels[+i],
+                            h - j * self.config.lengthPerQuaers - self.config.height - start + offset,
+                            p,
+                            self.config.height
+                        );
+                    }
                 }
+
+                start += self.config.lengthPerQuaers;
             }
 
-            // auto update hash
-            var currentIndex = +(window.location.hash.replace(/^#/, '') || 0);
-            var autoplay = S.later(function() {
-                //window.location.hash = '#' + padding(++currentIndex, 3);
-            }, 1000);
         };
 
         // padding numbers 9999 10 0000009999
@@ -134,6 +142,19 @@ O2.add('notes', function(O2, undefined) {
         redraw();
         E.on(window, 'hashchange', redraw);
 
+        var quaerCount = 0;
+        var autoplay = setInterval(function() {
+            //if (!O2.play) return;
+            offset += self.config.speed;
+            if (offset % self.config.lengthPerQuaers === 0) {
+                offset = 0;
+                quaerCount++;
+                localStorage.setItem('quaer', padding(quaerCount, 3));
+            }
+            redraw();
+        }, self.config.lengthPerQuaers / (self.config.speed * 1000));
+
+        // keyboard {{{
         // s,d,f,space,j,k,l
         var keys = [83, 68, 70, 32, 74, 75, 76],
             keyMap = [
@@ -157,7 +178,6 @@ O2.add('notes', function(O2, undefined) {
                 keyMap[i].keyDown = true;
             }
         });
-
         E.on(document, 'keyup', function(e) {
             var i = keys.indexOf(e.keyCode);
             if (i !== -1) {
@@ -166,19 +186,30 @@ O2.add('notes', function(O2, undefined) {
                 keyMap[i].keyDown = false;
             }
         });
-
-        var mc = S.get('#meta');
-        S.one(S.DOM.create('<dt>标题</dt><dd>' + self.header['TITLE'] + '</dd>')).appendTo(mc);
-        S.one(S.DOM.create('<dt>作者</dt><dd>' + self.header['ARTIST'] + '</dd>')).appendTo(mc);
-        S.one(S.DOM.create('<dt>曲风</dt><dd>' + self.header['GENRE'] + '</dd>')).appendTo(mc);
-        S.one(S.DOM.create('<dt>难度</dt><dd>' + O2.BMS.level[self.header['RANK']] + '</dd>')).appendTo(mc);
-        S.one(S.DOM.create('<dt>等级</dt><dd>' + O2.BMS.level[self.header['PLAYLEVEL']] + '</dd>')).appendTo(mc);
+        // }}}
     };
 
     S.ready(function() {
         S.IO.get('../data/canon/canon.json', function(o) {
-            var notes = new Notes(S.JSON.parse(o), {notesContainer: S.get('#notes-canvas-notes'), effectContainer: S.get('#notes-canvas')});
+            if (localStorage.getItem('quaer') === undefined || localStorage.getItem('offset') === undefined) {
+                // init all notes data
+                localStorage.setItem('quaer', window.location.hash.replace(/^#/, '') || '001');
+                localStorage.setItem('offset', 0);
+            }
+            var notes = new Notes(S.JSON.parse(o), {
+                notesContainer: S.get('#notes-canvas-notes'),
+                backgroundContainer: S.get('#notes-canvas-background'),
+                effectContainer: S.get('#notes-canvas')
+            });
             O2.Music = notes;
+
+            var mc = S.get('#meta');
+            S.one(S.DOM.create('<dt>标题</dt><dd>' + notes.header['TITLE'] + '</dd>')).appendTo(mc);
+            S.one(S.DOM.create('<dt>作者</dt><dd>' + notes.header['ARTIST'] + '</dd>')).appendTo(mc);
+            S.one(S.DOM.create('<dt>曲风</dt><dd>' + notes.header['GENRE'] + '</dd>')).appendTo(mc);
+            S.one(S.DOM.create('<dt>难度</dt><dd>' + O2.BMS.level[notes.header['RANK']] + '</dd>')).appendTo(mc);
+            S.one(S.DOM.create('<dt>等级</dt><dd>' + O2.BMS.level[notes.header['PLAYLEVEL']] + '</dd>')).appendTo(mc);
         });
+        O2.FPS.log('#fps');
     });
 });

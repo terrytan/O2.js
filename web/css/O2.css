@@ -53,6 +53,7 @@ body {
 }
 
 #notes-canvas,
+#notes-canvas-background,
 #notes-canvas-notes {
     position: absolute;
     top: 0;
@@ -76,4 +77,10 @@ body {
 
 #meta dt:after {
     content: ': ';
+}
+
+#fps {
+    position: absolute;
+    left: 10px;
+    top: 10px;
 }

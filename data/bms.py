@@ -70,8 +70,6 @@ class BMS():
             if g.group(1) not in self.body:
                 self.body[g.group(1)] = {}
             self.body[g.group(1)][g.group(2)] = self.parse_message(g.group(3))
-            if g.group(1) == '003':
-                print self.parse_message(g.group(3))
 
     def parse_message(self, message, start = 0, per = 2):
         """parse main music data to offset data"""
