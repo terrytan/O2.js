@@ -18,5 +18,19 @@
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
 O2.add('audio', function() {
-    //
+    var S = KISSY, D = S.DOM;
+    O2.audio = {
+        add: function(m, path) {
+            if (!O2.audio[m]) {
+                var audio = D.create('<audio></audio>');
+                audio.preload = true;
+                audio.src = path;
+                S.one('#music').append(audio);
+                O2.audio[m] = audio;
+            }
+        },
+        play: function(m) {
+            O2.audio[m].play();
+        }
+    };
 });

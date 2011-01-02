@@ -83,6 +83,10 @@ O2.add('notes', function(O2, undefined) {
 
         localStorage.setItem('quaer', window.location.hash.replace(/^#/, '') || '001');
 
+        for (var i in self.define.WAV) {
+            O2.audio.add(i, '../data/canon/' + self.define.WAV[i]);
+        }
+
         // redraw notes
         var redraw = function() {
             O2.FPS.init();
