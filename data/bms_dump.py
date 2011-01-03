@@ -43,7 +43,8 @@ def main(argv):
     output = json.dumps({
         'header': bms.header,
         'define': bms.define,
-        'body': bms.body
+        'body': bms.body,
+        'length': len(bms.body)
     })
     if _debug:
         print output
