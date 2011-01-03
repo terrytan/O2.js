@@ -27,45 +27,30 @@ O2.add('notes', function(O2, undefined) {
     var MAX_HEIGHT = 8000;
 
     var defaultConfig = {
-        lengthPerQuaers: 400,
+        lengthPerQuaers: 395,
         speed: 1,
         bpm: 130,
+        autoplay: false,
         height: 8
     };
 
-    var color = {
-        blue: '#009999',
-        red: '#ff0000',
-        white: '#ffffff',
-        green: '#00cc00',
-        black: '#000000',
-        orange: '#ff7400'
-    };
-    var notesColor = [color.white, color.blue, color.white, color.orange, color.white, color.blue, color.white];
+    var color = O2.Skin.color, notesColor = O2.Skin.notesColor;
+    var drawLine = O2.Canvas.drawLine,
+        drawRect = O2.Canvas.drawRect,
+        drawGradient = O2.Canvas.drawGradient;
 
-    // draw a line, rect, gradient {{{
-    var drawLine = function(context, color, start, end, width) {
-        context.strokeStyle = color;
-        context.lineWidth = 1;
-        context.beginPath();
-        context.moveTo(start.x, start.y);
-        context.lineTo(end.x, end.y);
-        context.stroke();
-    };
-
-    var drawRect = function(context, color, x, y, width, height) {
-        context.fillStyle = color;
-        context.fillRect(x, y, width, height);
-    };
-
-    var drawGradient = function(context, colors, sx, sy, dx, dy) {
-        var gradient = context.createLinearGradient(sx, sy, dx, dy);
-        for (var i in colors) {
-            gradient.addColorStop(i, colors[i]);
+    // padding numbers 9999 10 0000009999
+    var padding = function(num, len, markup) {
+        len = Math.pow(10, len - 1); markup = markup || 0;
+        if (num < len) {
+            var l = len.toString().length - num.toString().length, za = [];
+            while (za.length < l) {
+                za[za.length] = markup;
+            }
+            return za.join('') + num;
         }
-        return gradient;
+        return num;
     };
-    // }}}
 
     // create a notes canvas
     var createCanvas = function(notesContainer, height, offset) {
@@ -96,7 +81,7 @@ O2.add('notes', function(O2, undefined) {
         var ec = self.config.effectContainer, ectx = ec.getContext('2d'),
             bc = self.config.backgroundContainer, bctx = bc.getContext('2d');
 
-        for (var n = 0, l = nctxes.length; n < l; n++) {
+        for (var n = 0, nxl = nctxes.length; n < nxl; n++) {
             var nctx = nctxes[n], nc = nctx.canvas;
 
             var nl = nc.width, h = nc.height, eh = ec.height, p = nl / 7;
@@ -113,7 +98,7 @@ O2.add('notes', function(O2, undefined) {
 
             // add audio
             for (var i in self.define.WAV) {
-                O2.audio.add(i, '../data/canon/' + self.define.WAV[i]);
+                O2.Audio.add(i, '../data/canon/' + self.define.WAV[i]);
             }
 
             // draw notes
@@ -167,25 +152,18 @@ O2.add('notes', function(O2, undefined) {
                     start += self.config.lengthPerQuaers * self.config.speed;
                 }
             };
+
+            draw();
+
         }
+
+        // TODO make this out
+        O2.channels = channels;
 
         // draw hori split
         for (var i = 0, l = channels.length; i < l; i++) {
             drawLine(bctx, color.white, {x: channels[i], y: 0}, {x: channels[i], y: h}, 1);
         }
-
-        // padding numbers 9999 10 0000009999
-        var padding = function(num, len, markup) {
-            len = Math.pow(10, len - 1); markup = markup || 0;
-            if (num < len) {
-                var l = len.toString().length - num.toString().length, za = [];
-                while (za.length < l) {
-                    za[za.length] = markup;
-                }
-                return za.join('') + num;
-            }
-            return num;
-        };
 
         // show current viewport canvas
         var left, right;
@@ -210,57 +188,22 @@ O2.add('notes', function(O2, undefined) {
             }
         };
 
-        draw();
-        //E.on(window, 'hashchange', draw);
-
         var quaerCount = 0,
             bottom = [];
         for (var i = 0, l = nctxes.length; i < l; i++) {
             bottom.push(parseInt(nctxes[i].canvas.style.bottom.replace('px$', '')));
         }
+
         setInterval(function() {
-            //if (!O2.play) return;
+            //if (!self.config.autoplay) return;
             O2.FPS.init();
-            offset += self.config.speed;
-            for (var i = 0, l = nctxes.length; i < l; i++) {
+            offset += self.config.speed * self.config.lengthPerQuaers * parseInt(self.header.BPM) / (60 * 1000);
+            for (var i = 0, nxl = nctxes.length; i < nxl; i++) {
                 nctxes[i].canvas.style.bottom = bottom[i] - offset + 'px';
             }
             viewportCanvas(offset);
-        }, self.config.lengthPerQuaers / (self.config.speed * 1000));
+        }, 1);
 
-        // keyboard {{{
-        // s,d,f,space,j,k,l
-        var keys = [83, 68, 70, 32, 74, 75, 76],
-            keyMap = [
-                {which: 83, color: color.blue, keyDown: false},
-                {which: 68, color: color.green, keyDown: false},
-                {which: 70, color: color.blue, keyDown: false},
-                {which: 32, color: color.red, keyDown: false},
-                {which: 74, color: color.blue, keyDown: false},
-                {which: 75, color: color.green, keyDown: false},
-                {which: 76, color: color.blue, keyDown: false}
-            ];
-        E.on(document, 'keydown', function(e) {
-            var i = keys.indexOf(e.keyCode);
-            if (i !== -1) {
-                if (keyMap[i].keyDown) return;
-                var s = channels[i];
-                ectx.fillStyle = drawGradient(ectx,
-                    {0: 'rgba(255, 255, 255, 0)', 1: keyMap[i].color},
-                    s, 0, s, eh);
-                drawRect(ectx, ectx.fillStyle, s, 0, p, h);
-                keyMap[i].keyDown = true;
-            }
-        });
-        E.on(document, 'keyup', function(e) {
-            var i = keys.indexOf(e.keyCode);
-            if (i !== -1) {
-                var s = channels[i];
-                ectx.clearRect(s, 0, p, h);
-                keyMap[i].keyDown = false;
-            }
-        });
-        // }}}
     };
 
     S.ready(function() {
@@ -276,6 +219,11 @@ O2.add('notes', function(O2, undefined) {
                 effectContainer: S.get('#notes-canvas')
             });
             O2.Music = notes;
+            O2.play = function() {
+                O2.Music.config.autoplay = true;
+            };
+
+            O2.use('keyboard');
 
             var mc = S.get('#meta');
             S.one(S.DOM.create('<dt>БъЬт</dt><dd>' + notes.header['TITLE'] + '</dd>')).appendTo(mc);

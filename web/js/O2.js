@@ -19,16 +19,22 @@
  */
 KISSY.app('O2');
 O2.MODS = [
-    'notes',
-    'keyboard',
+    'skin',
+    'canvas',
     'fps',
-    'audio'
+    'audio',
+    'notes'
 ];
 
 KISSY.each(O2.MODS, function(o) {
     O2.add(o, {
         fullpath: 'js/' + o + '.js'
     });
+});
+
+O2.add('keyboard', {
+    fullpath: 'js/keyboard.js',
+    requires: O2.MODS
 });
 
 O2.add('core', {

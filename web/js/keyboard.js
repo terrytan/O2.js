@@ -19,12 +19,52 @@
  */
 O2.add('keyboard', function() {
     var S = KISSY, E = S.Event;
+    var color = O2.Skin.color,
+        channels = O2.channels;
+
+    var drawLine = O2.Canvas.drawLine,
+        drawRect = O2.Canvas.drawRect,
+        drawGradient = O2.Canvas.drawGradient;
+
+    // background layer, effects layer
+    var ec = O2.Music.config.effectContainer, ectx = ec.getContext('2d'),
+        bc = O2.Music.config.backgroundContainer, bctx = bc.getContext('2d');
+        nl = ec.width, eh = ec.height, p = nl / 7;
 
     // s,d,f,space,j,k,l
-    var keys = [83, 68, 70, 32, 74, 75, 76];
+    var keys = [83, 68, 70, 32, 74, 75, 76],
+        keyMap = [
+            {which: 83, color: color.blue, keyDown: false},
+            {which: 68, color: color.green, keyDown: false},
+            {which: 70, color: color.blue, keyDown: false},
+            {which: 32, color: color.red, keyDown: false},
+            {which: 74, color: color.blue, keyDown: false},
+            {which: 75, color: color.green, keyDown: false},
+            {which: 76, color: color.blue, keyDown: false}
+        ];
 
+    var audio = ['0A', '0B', '0C', '0D', '0E', '0F', '0G'];
     E.on(document, 'keydown', function(e) {
-        if (keys.indexOf(e.keyCode)) {
+        var i = keys.indexOf(e.keyCode);
+        if (i !== -1) {
+            O2.Audio[audio[i]].pause();
+            O2.Audio[audio[i]].currentTime = 0;
+            O2.Audio[audio[i]].play();
+            if (keyMap[i].keyDown) return;
+            var s = channels[i];
+            ectx.fillStyle = drawGradient(ectx,
+                {0: 'rgba(255, 255, 255, 0)', 1: keyMap[i].color},
+                s, 0, s, eh);
+            drawRect(ectx, ectx.fillStyle, s, 0, p, eh);
+            keyMap[i].keyDown = true;
+        }
+    });
+    E.on(document, 'keyup', function(e) {
+        var i = keys.indexOf(e.keyCode);
+        if (i !== -1) {
+            var s = channels[i];
+            ectx.clearRect(s, 0, p, eh);
+            keyMap[i].keyDown = false;
         }
     });
 });

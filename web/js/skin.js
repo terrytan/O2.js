@@ -1,5 +1,5 @@
 /**
- * @fileoverview O2 Audio.
+ * @fileoverview O2 Skins.
  * @author yyfrankyy<yyfrankyy@gmail.com>
  *
  * @license
@@ -17,21 +17,19 @@
  *
  *  0. You just DO WHAT THE FUCK YOU WANT TO.
  */
-O2.add('audio', function() {
-    var S = KISSY, D = S.DOM;
-    O2.Audio = {
-        add: function(m, path) {
-            if (!O2.Audio[m]) {
-                var audio = D.create('<audio></audio>');
-                audio.preload = true;
-                audio.src = path;
-                audio.volume = 1;
-                S.one('#music').append(audio);
-                O2.Audio[m] = audio;
-            }
-        },
-        play: function(m) {
-            O2.Audio[m].play();
-        }
+O2.add('skin', function() {
+    var color = {
+        blue: '#009999',
+        red: '#ff0000',
+        white: '#ffffff',
+        green: '#00cc00',
+        black: '#000000',
+        orange: '#ff7400'
+    };
+    var notesColor = [color.white, color.blue, color.white, color.orange, color.white, color.blue, color.white];
+
+    O2.Skin = {
+        color: color,
+        notesColor: notesColor
     };
 });
