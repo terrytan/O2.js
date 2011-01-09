@@ -43,13 +43,16 @@ O2.add('keyboard', function() {
             {which: 76, color: color.blue, keyDown: false}
         ];
 
-    var audio = ['0A', '0B', '0C', '0D', '0E', '0F', '0G'];
+    var audio = ['0A', '0B', '0C', '0D', '0E', '0F', '0G'],
+        play = function(a) {
+            //O2.Audio[a].pause();
+            O2.Audio[a].currentTime = 0;
+            O2.Audio[a].play();
+        };
     E.on(document, 'keydown', function(e) {
         var i = keys.indexOf(e.keyCode);
         if (i !== -1) {
-            O2.Audio[audio[i]].pause();
-            O2.Audio[audio[i]].currentTime = 0;
-            O2.Audio[audio[i]].play();
+            play(audio[i]);
             if (keyMap[i].keyDown) return;
             var s = channels[i];
             ectx.fillStyle = drawGradient(ectx,

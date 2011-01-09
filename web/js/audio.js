@@ -24,7 +24,7 @@ O2.add('audio', function() {
             if (!O2.Audio[m]) {
                 var audio = D.create('<audio></audio>');
                 audio.preload = true;
-                audio.src = path;
+                audio.src = escape(path);
                 audio.volume = 1;
                 S.one('#music').append(audio);
                 O2.Audio[m] = audio;
